@@ -62,10 +62,10 @@ Latency is in milliseconds. `req/s` is throughput; p50 / p99 are the median and 
 
 | Users | Redis req/s | Redis p50 | Redis p99 | SQL req/s | SQL p50 | SQL p99 |
 |---:|---:|---:|---:|---:|---:|---:|
-| 100 | 7,838 | 11.8 | 25.9 | 106 | 930 | 1,138 |
-| 250 | 5,901 | 40.6 | 74.0 | 109 | 2,263 | 2,519 |
-| 500 | 5,632 | 85.9 | 145.3 | 106 | 4,643 | 4,978 |
-| 1000 | 5,557 | 171.5 | 295.7 | unstable* | unstable* | unstable* |
+| 100 | 7,838 | 11.8 ms | 25.9 ms | 106 | 930 ms | 1,138 ms |
+| 250 | 5,901 | 40.6 ms | 74.0 ms | 109 | 2,263 ms | 2,519 ms |
+| 500 | 5,632 | 85.9 ms | 145.3 ms | 106 | 4,643 ms | 4,978 ms |
+| 1000 | 5,557 | 171.5 ms | 295.7 ms | unstable* | unstable* | unstable* |
 
 \* At 1000 users SQL rank latency sits at the 10 s client timeout. The three runs gave 7, 1,471 and 664 timeouts
 (throughput 106, 0 and 56 req/s), so no single number is meaningful. In every run it was effectively unusable.
@@ -74,10 +74,10 @@ Latency is in milliseconds. `req/s` is throughput; p50 / p99 are the median and 
 
 | Users | Redis req/s | Redis p50 | Redis p99 | SQL req/s | SQL p50 | SQL p99 |
 |---:|---:|---:|---:|---:|---:|---:|
-| 100 | 2,957 | 32.6 | 56.8 | 8,497 | 10.4 | 40.3 |
-| 250 | 2,862 | 84.3 | 134.6 | 8,020 | 25.8 | 125.8 |
-| 500 | 2,802 | 176.7 | 276.3 | 7,608 | 51.6 | 300.6 |
-| 1000 | 2,820 | 352.1 | 468.1 | 7,002 | 66.4 | 954.9 |
+| 100 | 2,957 | 32.6 ms | 56.8 ms | 8,497 | 10.4 ms | 40.3 ms |
+| 250 | 2,862 | 84.3 ms | 134.6 ms | 8,020 | 25.8 ms | 125.8 ms |
+| 500 | 2,802 | 176.7 ms | 276.3 ms | 7,608 | 51.6 ms | 300.6 ms |
+| 1000 | 2,820 | 352.1 ms | 468.1 ms | 7,002 | 66.4 ms | 954.9 ms |
 
 ### What the results show
 
@@ -110,26 +110,19 @@ Latency is in milliseconds. `req/s` is throughput; p50 / p99 are the median and 
 
 | Test | Users | Run 1 | Run 2 | Run 3 |
 |---|---:|---|---|---|
-| redis top | 100 | 2996 / 32.0 / 56.8 | 2957 / 32.6 / 51.1 | 2453 / 38.0 / 74.1 |
-| redis top | 250 | 2923 / 82.5 / 136.4 | 2847 / 85.2 / 125.3 | 2862 / 84.3 / 134.6 |
-| redis top | 500 | 2654 / 178.7 / 315.9 | 2876 / 171.1 / 276.3 | 2802 / 176.7 / 253.2 |
-| redis top | 1000 | 2821 / 348.3 / 457.6 | 2556 / 383.8 / 528.2 | 2820 / 352.1 / 468.1 |
-| redis rank | 100 | 8069 / 11.6 / 24.8 | 7838 / 11.8 / 25.9 | 7005 / 13.1 / 30.3 |
-| redis rank | 250 | 6430 / 37.9 / 71.5 | 5901 / 40.6 / 74.0 | 5511 / 43.0 / 84.0 |
-| redis rank | 500 | 6025 / 79.2 / 143.2 | 5632 / 85.9 / 145.3 | 5480 / 86.9 / 152.9 |
-| redis rank | 1000 | 5746 / 166.6 / 289.1 | 5377 / 182.7 / 297.7 | 5557 / 171.5 / 295.7 |
-| sql top | 100 | 8497 / 10.2 / 40.3 | 8510 / 10.4 / 38.3 | 8302 / 10.6 / 40.4 |
-| sql top | 250 | 8342 / 25.2 / 115.6 | 8020 / 25.8 / 125.8 | 7653 / 26.9 / 129.6 |
-| sql top | 500 | 7734 / 54.0 / 272.2 | 7608 / 49.8 / 300.6 | 7172 / 51.6 / 357.0 |
-| sql top | 1000 | 7163 / 66.4 / 883.6 | 6603 / 70.2 / 982.1 | 7002 / 65.8 / 954.9 |
-| sql rank | 100 | 114 / 873 / 1074 | 106 / 930 / 1138 | 104 / 959 / 1162 |
-| sql rank | 250 | 109 / 2263 / 2518 | 111 / 2248 / 2503 | 104 / 2403 / 2674 |
-| sql rank | 500 | 106 / 4632 / 4978 | 104 / 5059 / 5400 (2 errors) | 106 / 4643 / 4955 |
-| sql rank | 1000 | 106 / 9107 / 9736 (7 errors) | 0 / n/a (1471 errors, 5 successes) | 56 / 9663 / 9997 (664 errors) |
-
-## Ideas not done yet
-
-- Larger Hikari pool for the Postgres rank test (`spring.datasource.hikari.maximum-pool-size`).
-- Native Redis (or Redis on the same network path as Postgres) to remove the Docker overhead.
-- Short-lived cache for the top 100.
-- Mixed read/write load and live rank updates (Pub/Sub or Streams).
+| redis top | 100 | 2996 / 32.0 ms / 56.8 ms | 2957 / 32.6 ms / 51.1 ms | 2453 / 38.0 ms / 74.1 ms |
+| redis top | 250 | 2923 / 82.5 ms / 136.4 ms | 2847 / 85.2 ms / 125.3 ms | 2862 / 84.3 ms / 134.6 ms |
+| redis top | 500 | 2654 / 178.7 ms / 315.9 ms | 2876 / 171.1 ms / 276.3 ms | 2802 / 176.7 ms / 253.2 ms |
+| redis top | 1000 | 2821 / 348.3 ms / 457.6 ms | 2556 / 383.8 ms / 528.2 ms | 2820 / 352.1 ms / 468.1 ms |
+| redis rank | 100 | 8069 / 11.6 ms / 24.8 ms | 7838 / 11.8 ms / 25.9 ms | 7005 / 13.1 ms / 30.3 ms |
+| redis rank | 250 | 6430 / 37.9 ms / 71.5 ms | 5901 / 40.6 ms / 74.0 ms | 5511 / 43.0 ms / 84.0 ms |
+| redis rank | 500 | 6025 / 79.2 ms / 143.2 ms | 5632 / 85.9 ms / 145.3 ms | 5480 / 86.9 ms / 152.9 ms |
+| redis rank | 1000 | 5746 / 166.6 ms / 289.1 ms | 5377 / 182.7 ms / 297.7 ms | 5557 / 171.5 ms / 295.7 ms |
+| sql top | 100 | 8497 / 10.2 ms / 40.3 ms | 8510 / 10.4 ms / 38.3 ms | 8302 / 10.6 ms / 40.4 ms |
+| sql top | 250 | 8342 / 25.2 ms / 115.6 ms | 8020 / 25.8 ms / 125.8 ms | 7653 / 26.9 ms / 129.6 ms |
+| sql top | 500 | 7734 / 54.0 ms / 272.2 ms | 7608 / 49.8 ms / 300.6 ms | 7172 / 51.6 ms / 357.0 ms |
+| sql top | 1000 | 7163 / 66.4 ms / 883.6 ms | 6603 / 70.2 ms / 982.1 ms | 7002 / 65.8 ms / 954.9 ms |
+| sql rank | 100 | 114 / 873 ms / 1074 ms | 106 / 930 ms / 1138 ms | 104 / 959 ms / 1162 ms |
+| sql rank | 250 | 109 / 2263 ms / 2518 ms | 111 / 2248 ms / 2503 ms | 104 / 2403 ms / 2674 ms |
+| sql rank | 500 | 106 / 4632 ms / 4978 ms | 104 / 5059 ms / 5400 ms (2 errors) | 106 / 4643 ms / 4955 ms |
+| sql rank | 1000 | 106 / 9107 ms / 9736 ms (7 errors) | 0 / n/a (1471 errors, 5 successes) | 56 / 9663 ms / 9997 ms (664 errors) |
